@@ -6,16 +6,23 @@ public class GeneradorDiesel extends ActivoIndustrial implements ReguladoAmbient
 
     public static final double LIMITE_TEMPERATURA_REFRIGERANTE = 95.0;
     public static final double FACTOR_HORAS_OPERACION = 0.02;
-
     public static final double FACTOR_TEMPERATURA = 0.8;
+    public static final double TEMPERATURA_REPOSO = 80.0;
 
     private double temperaturaRefrigerante;
+
+    public GeneradorDiesel(String codigoSerie,
+                           LocalDate fechaInstalacion,
+                           double horasOperacion) {
+        this(codigoSerie, fechaInstalacion, horasOperacion, TEMPERATURA_REPOSO);
+    }
 
     public GeneradorDiesel(String codigoSerie,
                            LocalDate fechaInstalacion,
                            double horasOperacion,
                            double temperaturaRefrigerante) {
         super(codigoSerie, fechaInstalacion, horasOperacion);
+        validarTemperatura(temperaturaRefrigerante);
         this.temperaturaRefrigerante = temperaturaRefrigerante;
     }
 
@@ -26,11 +33,8 @@ public class GeneradorDiesel extends ActivoIndustrial implements ReguladoAmbient
     }
 
     @Override
-    public boolean indicarMantenimientoUrgente() {
-        if (temperaturaRefrigerante > LIMITE_TEMPERATURA_REFRIGERANTE) {
-            return true;
-        }
-        return false;
+    public boolean requiereParadaUrgente() {
+        return temperaturaRefrigerante > LIMITE_TEMPERATURA_REFRIGERANTE;
     }
 
     public void purgarCombustible() {
@@ -49,6 +53,14 @@ public class GeneradorDiesel extends ActivoIndustrial implements ReguladoAmbient
     }
 
     public void setTemperaturaRefrigerante(double temperaturaRefrigerante) {
+        validarTemperatura(temperaturaRefrigerante);
         this.temperaturaRefrigerante = temperaturaRefrigerante;
+    }
+
+    private static void validarTemperatura(double temperaturaRefrigerante) {
+        if (Double.isNaN(temperaturaRefrigerante) || temperaturaRefrigerante < 0) {
+            throw new IllegalArgumentException(
+                    "La temperatura del refrigerante no puede ser negativa.");
+        }
     }
 }

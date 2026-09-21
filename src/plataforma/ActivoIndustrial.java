@@ -26,7 +26,7 @@ public abstract class ActivoIndustrial {
 
     public abstract double calcularCriticidad();
 
-    public abstract boolean indicarMantenimientoUrgente();
+    public abstract boolean requiereParadaUrgente();
 
     public String getCodigoSerie() {
         return codigoSerie;

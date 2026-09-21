@@ -5,9 +5,7 @@ import java.time.LocalDate;
 public class TurbinaEolica extends ActivoIndustrial implements TelemetricoSCADA {
 
     public static final double FACTOR_VIBRACION = 12.0;
-
     public static final double FACTOR_DESGASTE_PALAS = 8.5;
- 
     public static final double UMBRAL_CRITICIDAD_URGENTE = 50.0;
 
     private double vibracionRodamientos;
@@ -19,6 +17,8 @@ public class TurbinaEolica extends ActivoIndustrial implements TelemetricoSCADA 
                          double vibracionRodamientos,
                          double desgastePalas) {
         super(codigoSerie, fechaInstalacion, horasOperacion);
+        validarVibracion(vibracionRodamientos);
+        validarDesgaste(desgastePalas);
         this.vibracionRodamientos = vibracionRodamientos;
         this.desgastePalas = desgastePalas;
     }
@@ -30,7 +30,7 @@ public class TurbinaEolica extends ActivoIndustrial implements TelemetricoSCADA 
     }
 
     @Override
-    public boolean indicarMantenimientoUrgente() {
+    public boolean requiereParadaUrgente() {
         return calcularCriticidad() >= UMBRAL_CRITICIDAD_URGENTE;
     }
 
@@ -52,6 +52,7 @@ public class TurbinaEolica extends ActivoIndustrial implements TelemetricoSCADA 
     }
 
     public void setVibracionRodamientos(double vibracionRodamientos) {
+        validarVibracion(vibracionRodamientos);
         this.vibracionRodamientos = vibracionRodamientos;
     }
 
@@ -60,6 +61,21 @@ public class TurbinaEolica extends ActivoIndustrial implements TelemetricoSCADA 
     }
 
     public void setDesgastePalas(double desgastePalas) {
+        validarDesgaste(desgastePalas);
         this.desgastePalas = desgastePalas;
+    }
+
+    private static void validarVibracion(double vibracionRodamientos) {
+        if (Double.isNaN(vibracionRodamientos) || vibracionRodamientos < 0) {
+            throw new IllegalArgumentException(
+                    "La vibración de rodamientos no puede ser negativa.");
+        }
+    }
+
+    private static void validarDesgaste(double desgastePalas) {
+        if (Double.isNaN(desgastePalas) || desgastePalas < 0 || desgastePalas > 100) {
+            throw new IllegalArgumentException(
+                    "El desgaste de palas debe estar entre 0 y 100 %.");
+        }
     }
 }
